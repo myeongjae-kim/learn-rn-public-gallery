@@ -1,12 +1,9 @@
 import React from 'react';
-import {StyleSheet, TextInput} from 'react-native';
+import {StyleSheet, TextInput, TextInputProps} from 'react-native';
 
 type Props = {
   hasMarginBottom?: boolean;
-  onChangeText?(text: string): void;
-  value?: string;
-  placeholder?: string;
-};
+} & TextInputProps;
 
 const BorderedInput = ({hasMarginBottom, ...rest}: Props) => {
   return (
