@@ -5,14 +5,17 @@ type Props = {
   hasMarginBottom?: boolean;
 } & TextInputProps;
 
-const BorderedInput = ({hasMarginBottom, ...rest}: Props) => {
-  return (
-    <TextInput
-      style={[styles.input, hasMarginBottom && styles.margin]}
-      {...rest}
-    />
-  );
-};
+const BorderedInput = React.forwardRef<TextInput, Props>(
+  ({hasMarginBottom, ...rest}, ref) => {
+    return (
+      <TextInput
+        style={[styles.input, hasMarginBottom && styles.margin]}
+        ref={ref}
+        {...rest}
+      />
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   input: {

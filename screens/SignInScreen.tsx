@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import BorderedInput from '../components/BorderedInput';
@@ -35,6 +36,9 @@ const SignInScreen = ({navigation, route}: Props) => {
     console.log(form);
   };
 
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+
   return (
     <KeyboardAvoidingView
       style={styles.keyboardAvoidingView}
@@ -51,6 +55,8 @@ const SignInScreen = ({navigation, route}: Props) => {
             autoCorrect={false}
             autoComplete={'email'}
             keyboardType={'email-address'}
+            returnKeyType={'next'}
+            onSubmitEditing={() => passwordRef.current?.focus()}
           />
           <BorderedInput
             hasMarginBottom={isSignUp}
@@ -58,6 +64,15 @@ const SignInScreen = ({navigation, route}: Props) => {
             value={form.password}
             onChangeText={createChangeTextHandler('password')}
             secureTextEntry
+            ref={passwordRef}
+            returnKeyType={isSignUp ? 'next' : 'done'}
+            onSubmitEditing={() => {
+              if (isSignUp) {
+                confirmPasswordRef.current?.focus();
+              } else {
+                onSubmit();
+              }
+            }}
           />
           {isSignUp && (
             <BorderedInput
@@ -65,6 +80,9 @@ const SignInScreen = ({navigation, route}: Props) => {
               value={form.confirmPassword}
               onChangeText={createChangeTextHandler('confirmPassword')}
               secureTextEntry
+              ref={confirmPasswordRef}
+              returnKeyType={'done'}
+              onSubmitEditing={onSubmit}
             />
           )}
           <View style={styles.buttons}>
