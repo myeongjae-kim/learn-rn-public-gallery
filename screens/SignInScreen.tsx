@@ -14,6 +14,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import SignForm from '../components/SignForm';
 import SignButtons from '../components/SignButtons';
 import {signIn, signUp} from '../lib/auth';
+import {getUser, User} from '../lib/users';
+import {useUserContext} from '../contexts/UserContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 export type SignFormType = {
@@ -22,7 +24,7 @@ export type SignFormType = {
   confirmPassword: string;
 };
 
-const SignInScreen = ({navigation: _navigation, route}: Props) => {
+const SignInScreen = ({navigation, route}: Props) => {
   const {isSignUp} = route.params ?? {};
   const [form, setForm] = useState<SignFormType>({
     email: '',
@@ -30,6 +32,7 @@ const SignInScreen = ({navigation: _navigation, route}: Props) => {
     confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
+  const {setUser} = useUserContext();
 
   const createChangeTextHandler =
     (name: keyof SignFormType) => (value: string) => {
@@ -48,7 +51,12 @@ const SignInScreen = ({navigation: _navigation, route}: Props) => {
     setLoading(true);
     try {
       const {user} = isSignUp ? await signUp(info) : await signIn(info);
-      console.log(user);
+      const profile = (await getUser(user.uid)) as unknown as User;
+      if (!profile) {
+        navigation.navigate('Welcome', {uid: user.uid});
+      } else {
+        setUser(profile);
+      }
     } catch (e) {
       const messages = {
         'auth/email-already-in-use': '이미 가입된 이메일입니다.',
