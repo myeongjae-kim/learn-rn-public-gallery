@@ -51,7 +51,7 @@ const SignInScreen = ({navigation, route}: Props) => {
     setLoading(true);
     try {
       const {user} = isSignUp ? await signUp(info) : await signIn(info);
-      const profile = (await getUser(user.uid)) as unknown as User;
+      const profile = await getUser(user.uid);
       if (!profile) {
         navigation.navigate('Welcome', {uid: user.uid});
       } else {

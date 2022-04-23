@@ -25,4 +25,4 @@ export const getUser = (id: string) =>
   usersCollection
     .doc(id)
     .get()
-    .then(it => it.data());
+    .then(it => it.data() as unknown as User);
