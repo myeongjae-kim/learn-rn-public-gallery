@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Image, Platform, Pressable, StyleSheet, View} from 'react-native';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {RootNavigationProps, RootStackParamList} from '../screens/RootStack';
 import {createUser, UserCreationRequest} from '../lib/users';
@@ -7,11 +7,14 @@ import {signOut} from '../lib/auth';
 import BorderedInput from './BorderedInput';
 import CustomButton from './CustomButton';
 import {useUserContext} from '../contexts/UserContext';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {ImagePickerResponse} from 'react-native-image-picker/src/types';
 
 const SetupProfile = () => {
   const [displayName, setDisplayName] = useState('');
   const navigation = useNavigation<RootNavigationProps>();
   const {setUser} = useUserContext();
+  const [response, setResponse] = useState<ImagePickerResponse | null>(null);
 
   const {params} = useRoute<RouteProp<RootStackParamList, 'Welcome'>>();
   const {uid} = params || {};
@@ -31,9 +34,38 @@ const SetupProfile = () => {
     navigation.goBack();
   };
 
+  const onSelectImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        maxWidth: 512,
+        maxHeight: 512,
+        includeBase64: Platform.OS === 'android',
+      },
+      res => {
+        if (res.didCancel) {
+          // 취소했을 경우
+          return;
+        }
+        setResponse(res);
+      },
+    ).then();
+  };
+
   return (
     <View style={styles.block}>
-      <View style={styles.circle} />
+      <Pressable onPress={onSelectImage}>
+        <Image
+          style={styles.circle}
+          source={
+            response
+              ? {
+                  uri: response?.assets?.[0]?.uri,
+                }
+              : require('../assets/user.png')
+          }
+        />
+      </Pressable>
       <View style={styles.form}>
         <BorderedInput
           placeholder={'닉네임'}
