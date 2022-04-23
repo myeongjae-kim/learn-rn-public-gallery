@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {Image, Platform, Pressable, StyleSheet, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {RootNavigationProps, RootStackParamList} from '../screens/RootStack';
 import {createUser, UserCreationRequest} from '../lib/users';
@@ -9,6 +16,7 @@ import CustomButton from './CustomButton';
 import {useUserContext} from '../contexts/UserContext';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ImagePickerResponse} from 'react-native-image-picker/src/types';
+import storage from '@react-native-firebase/storage';
 
 const SetupProfile = () => {
   const [displayName, setDisplayName] = useState('');
@@ -19,11 +27,35 @@ const SetupProfile = () => {
   const {params} = useRoute<RouteProp<RootStackParamList, 'Welcome'>>();
   const {uid} = params || {};
 
-  const onSubmit = () => {
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async () => {
+    setLoading(false);
+
+    let photoUrl: string | null = null;
+
+    if (response && response.assets) {
+      const asset = response.assets[0];
+      const extension = asset.fileName?.split('.').pop() ?? '';
+
+      const path = `/profile/${uid}.${extension}`;
+      const reference = storage().ref(path);
+
+      if (Platform.OS === 'android') {
+        await reference.putString(asset.base64 || '', 'base64', {
+          contentType: asset.type,
+        });
+      } else {
+        await reference.putFile(asset.uri ?? '');
+      }
+
+      photoUrl = response ? await reference.getDownloadURL() : null;
+    }
+
     const user: UserCreationRequest = {
       id: uid,
       displayName,
-      photoUrl: null,
+      photoUrl,
     };
     createUser(user).then();
     setUser({...user, id: user.id ?? ''});
@@ -74,10 +106,22 @@ const SetupProfile = () => {
           onSubmitEditing={onSubmit}
           returnKeyType={'next'}
         />
-        <View style={styles.buttons}>
-          <CustomButton title={'다음'} onPress={onSubmit} hasMarginBottom />
-          <CustomButton title={'취소'} onPress={onCancel} theme={'secondary'} />
-        </View>
+        {loading ? (
+          <ActivityIndicator
+            size={32}
+            color={'#6200ee'}
+            style={styles.spinner}
+          />
+        ) : (
+          <View style={styles.buttons}>
+            <CustomButton title={'다음'} onPress={onSubmit} hasMarginBottom />
+            <CustomButton
+              title={'취소'}
+              onPress={onCancel}
+              theme={'secondary'}
+            />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -98,10 +142,16 @@ const styles = StyleSheet.create({
   },
   form: {
     marginTop: 16,
-    widht: '100%',
+    width: '100%',
   },
   buttons: {
     marginTop: 48,
+  },
+  spinner: {
+    marginTop: 64,
+    height: 104,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
