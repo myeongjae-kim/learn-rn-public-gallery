@@ -13,10 +13,10 @@ import UploadScreen from './UploadScreen';
 import {ImagePickerResponse} from 'react-native-image-picker';
 
 export type RootStackParamList = {
-  SignIn: {isSignUp: boolean | undefined};
-  Welcome: {uid: string | undefined};
+  SignIn: {isSignUp?: boolean};
+  Welcome: {uid?: string};
   MainTab: undefined;
-  Upload: {res: ImagePickerResponse | undefined};
+  Upload: {res?: ImagePickerResponse};
 };
 
 export type RootNavigationProps = NativeStackNavigationProp<RootStackParamList>;

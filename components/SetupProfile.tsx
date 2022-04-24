@@ -17,6 +17,7 @@ import {useUserContext} from '../contexts/UserContext';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ImagePickerResponse} from 'react-native-image-picker/src/types';
 import storage from '@react-native-firebase/storage';
+import Avatar from './Avatar';
 
 const SetupProfile = () => {
   const [displayName, setDisplayName] = useState('');
@@ -87,15 +88,9 @@ const SetupProfile = () => {
   return (
     <View style={styles.block}>
       <Pressable onPress={onSelectImage}>
-        <Image
-          style={styles.circle}
-          source={
-            response
-              ? {
-                  uri: response?.assets?.[0]?.uri,
-                }
-              : require('../assets/user.png')
-          }
+        <Avatar
+          source={response ? {uri: response?.assets?.[0]?.uri} : undefined}
+          size={128}
         />
       </Pressable>
       <View style={styles.form}>
@@ -133,12 +128,6 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 16,
     width: '100%',
-  },
-  circle: {
-    backgroundColor: '#cdcdcd',
-    borderRadius: 64,
-    width: 128,
-    height: 128,
   },
   form: {
     marginTop: 16,
