@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {
   ActionSheetIOS,
+  Alert,
   Platform,
   Pressable,
   StyleSheet,
@@ -15,6 +16,8 @@ import {
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
+import {useNavigation} from '@react-navigation/native';
+import {RootNavigationProps} from '../screens/RootStack';
 
 const TABBAR_HEIGHT = 49;
 
@@ -28,6 +31,7 @@ const imagePickerOption: CameraOptions = {
 const CameraButton = () => {
   const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation<RootNavigationProps>();
 
   const bottom = Platform.select({
     android: TABBAR_HEIGHT / 2,
@@ -38,7 +42,7 @@ const CameraButton = () => {
     if (res.didCancel || !res) {
       return;
     }
-    console.log(res);
+    navigation.push('Upload', {res});
   };
 
   const onLaunchCamera = () => {
@@ -63,7 +67,7 @@ const CameraButton = () => {
       buttonIndex => {
         if (buttonIndex === 0) {
           onLaunchCamera();
-        } else if (buttonIndex === 2) {
+        } else if (buttonIndex === 1) {
           onLaunchImageLibrary();
         }
       },

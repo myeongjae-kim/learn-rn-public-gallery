@@ -9,11 +9,14 @@ import {useUserContext} from '../contexts/UserContext';
 import MainTab from './MainTab';
 import {subscribeAuth} from '../lib/auth';
 import {getUser} from '../lib/users';
+import UploadScreen from './UploadScreen';
+import {ImagePickerResponse} from 'react-native-image-picker';
 
 export type RootStackParamList = {
   SignIn: {isSignUp: boolean | undefined};
   Welcome: {uid: string | undefined};
   MainTab: undefined;
+  Upload: {res: ImagePickerResponse | undefined};
 };
 
 export type RootNavigationProps = NativeStackNavigationProp<RootStackParamList>;
@@ -48,6 +51,11 @@ const RootStack = () => {
             name={'MainTab'}
             component={MainTab}
             options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={'Upload'}
+            component={UploadScreen}
+            options={{title: '새 게시물', headerBackTitle: '뒤로가기'}}
           />
         </>
       ) : (
