@@ -5,9 +5,16 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 type Props = {
   visible: boolean;
   onClose(): void;
+  onLaunchCamera(): void;
+  onLaunchImageLibrary(): void;
 };
 
-const UploadModeModal = ({visible, onClose}: Props) => {
+const UploadModeModal = ({
+  visible,
+  onClose,
+  onLaunchCamera,
+  onLaunchImageLibrary,
+}: Props) => {
   return (
     <Modal
       visible={visible}
@@ -18,7 +25,11 @@ const UploadModeModal = ({visible, onClose}: Props) => {
         <View style={styles.whiteBox}>
           <Pressable
             style={styles.actionButton}
-            android_ripple={{color: '#eee'}}>
+            android_ripple={{color: '#eee'}}
+            onPress={() => {
+              onLaunchCamera();
+              onClose();
+            }}>
             <Icon
               name={'camera-alt'}
               color={'#757575'}
@@ -29,7 +40,11 @@ const UploadModeModal = ({visible, onClose}: Props) => {
           </Pressable>
           <Pressable
             style={styles.actionButton}
-            android_ripple={{color: '#eee'}}>
+            android_ripple={{color: '#eee'}}
+            onPress={() => {
+              onLaunchImageLibrary();
+              onClose();
+            }}>
             <Icon
               name={'photo'}
               color={'#757575'}
